@@ -10,7 +10,7 @@ import java.util.ArrayList;
 class Model {
 
 
-    private static final File DIRECTORY = new File("C://Users//HP//Documents//GitHub//CracrerTasks//Iformation System//src");
+    private static final File DIRECTORY = new File("C://Users//HP//Documents//GitHub//Information-System//Iformation System//src");
     private static final File DATABASE = new File(DIRECTORY, "Database.txt");
     private static ArrayList<Object> RUNTIME_DATABASE = new ArrayList<Object>();
 

@@ -6,14 +6,14 @@ import InformationClasses.*;
 import java.io.*;
 
 /*
-*Контроллер - отвечает за взаимодействие с пользователем;
-*/
+ *Контроллер - отвечает за взаимодействие с пользователем;
+ */
 public class Controller {
 
 
     //Список команд справочника
 
-    private static final String[] Commands = {"Get", "SetBook", "SetBookInst", "AddBook", "AddBookInst", "Delete", "Exit"};
+    private static final String[] Commands = {"Get", "SetBook", "SetBookInst", "AddBook", "AddBookInst", "Delete", "Exit", "AddInfFromFile"};
 
     //метод для начала работы со справочником
 
@@ -51,7 +51,7 @@ public class Controller {
 
     //метод для выполнения команды "Get"
 
-    private static void getInfo(Reader in) throws IOException, ClassNotFoundException {
+    private static void getInfo(Reader in) throws IOException {
         StreamTokenizer input = new StreamTokenizer(in);
         input.nextToken();
         int position = (int) input.nval;
@@ -61,7 +61,7 @@ public class Controller {
 
     //метод для выполнения команды "SetBook"
 
-    private static void setBook(Reader in) throws IOException, ClassNotFoundException {
+    private static void setBook(Reader in) throws IOException {
         String authors, title;
         int publishingYear, pagesNumber;
         int position;
@@ -81,7 +81,7 @@ public class Controller {
 
     //метод для выполнения команды "SetBookInst"
 
-    private static void setBookInstance(Reader in) throws IOException, ClassNotFoundException {
+    private static void setBookInstance(Reader in) throws IOException {
         String authors, title;
         int publishingYear, pagesNumber, inventoryNumber;
         int position;
@@ -109,7 +109,7 @@ public class Controller {
 
     //метод для выполнения команды "Delete"
 
-    private static void deleteInfo(Reader in) throws IOException, ClassNotFoundException {
+    private static void deleteInfo(Reader in) throws IOException {
         StreamTokenizer input = new StreamTokenizer(in);
         input.nextToken();
         int position = (int) input.nval;
@@ -118,7 +118,7 @@ public class Controller {
 
     //метод для выполнения команды "AddBook"
 
-    private static void addBook(Reader in) throws IOException, ClassNotFoundException {
+    private static void addBook(Reader in) throws IOException {
         String authors, title;
         int publishingYear, pagesNumber;
         StreamTokenizer input = new StreamTokenizer(in);
@@ -136,10 +136,9 @@ public class Controller {
 
     //метод для выполнения команды "AddBookInst"
 
-    private static void addBookInstance(Reader in) throws IOException, ClassNotFoundException {
+    private static void addBookInstance(Reader in) throws IOException {
         String authors, title;
         int publishingYear, pagesNumber, inventoryNumber;
-
         boolean issued = false;
         StreamTokenizer input = new StreamTokenizer(in);
         input.nextToken();
@@ -160,9 +159,22 @@ public class Controller {
                 new Book(authors, title, publishingYear, pagesNumber), issued));
     }
 
+    //метод добавления информации из файла
+
+    private static void addInfFromFile(Reader in) throws IOException, ClassNotFoundException {
+        String directory;
+        String filename;
+        StreamTokenizer input = new StreamTokenizer(in);
+        input.nextToken();
+        directory = input.sval;
+        input.nextToken();
+        filename = input.sval;
+        Model.addInformationFromFile(new File(directory, filename));
+    }
+
     //метод для получения команды с клавиатуры
 
-    private static void getCommand(Reader in) throws NotACommandException, IOException, ClassNotFoundException, EndOfProgramm {
+    private static void getCommand(Reader in) throws NotACommandException, IOException, EndOfProgramm, ClassNotFoundException {
         StreamTokenizer input = new StreamTokenizer(in);
         input.nextToken();
         String comm = input.sval;
@@ -189,6 +201,10 @@ public class Controller {
             }
             case ("AddBookInst"): {
                 addBookInstance(in);
+                break;
+            }
+            case ("AddInfFromFile"): {
+                addInfFromFile(in);
                 break;
             }
             case ("Exit"): {

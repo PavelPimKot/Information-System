@@ -1,6 +1,7 @@
 package InformationClasses;
 
 import java.io.Serializable;
+
 public class BookInstance implements Serializable {
 
 
@@ -16,7 +17,7 @@ public class BookInstance implements Serializable {
         return inventoryNumber;
     }
 
-    public boolean getIssued(){
+    public boolean getIssued() {
         return issued;
     }
 
@@ -24,7 +25,10 @@ public class BookInstance implements Serializable {
         this.book = book;
     }
 
-    public void setInventoryNumber(int inventoryNumber) {
+    public void setInventoryNumber(int inventoryNumber) throws BadFieldsException {
+        if (inventoryNumber < 0) {
+            throw (new BadFieldsException(" Неккоректный инветарный номер "));
+        }
         this.inventoryNumber = inventoryNumber;
     }
 
@@ -32,26 +36,26 @@ public class BookInstance implements Serializable {
         this.issued = issued;
     }
 
-    public  BookInstance(int inventoryNumber, Book book, boolean issued){
+    public BookInstance(int inventoryNumber, Book book, boolean issued) throws BadFieldsException {
         this.book = book;
-        this.inventoryNumber = inventoryNumber;
-        this.issued = issued;
+        this.setInventoryNumber(inventoryNumber);
+        this.setIssued(issued);
     }
 
     @Override
     public String toString() {
-       return "BookInstance(Invent numb: "+ inventoryNumber +" "+book.toString()+"issued: "+issued+")";
+        return "BookInstance(Invent numb: " + inventoryNumber + " " + book.toString() + "issued: " + issued + ")";
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(obj == this){
+        if (obj == this) {
             return true;
         }
-        if( obj instanceof BookInstance){
-            if(obj.hashCode() == hashCode()){
-                BookInstance toEq = (BookInstance)obj;
-                return book.equals(toEq.book)&&(inventoryNumber==toEq.inventoryNumber)&&(issued==toEq.issued);
+        if (obj instanceof BookInstance) {
+            if (obj.hashCode() == hashCode()) {
+                BookInstance toEq = (BookInstance) obj;
+                return book.equals(toEq.book) && (inventoryNumber == toEq.inventoryNumber) && (issued == toEq.issued);
             }
         }
         return false;
@@ -59,6 +63,6 @@ public class BookInstance implements Serializable {
 
     @Override
     public int hashCode() {
-        return inventoryNumber^book.hashCode();
+        return inventoryNumber ^ book.hashCode();
     }
 }

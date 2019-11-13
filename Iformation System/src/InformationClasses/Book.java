@@ -1,4 +1,5 @@
 package InformationClasses;
+
 import java.io.Serializable;
 
 public class Book implements Serializable {
@@ -27,11 +28,17 @@ public class Book implements Serializable {
         this.authors = authors;
     }
 
-    public void setPagesNumber(int pagesNumber) {
+    public void setPagesNumber(int pagesNumber) throws BadFieldsException {
+        if (pagesNumber <= 0) {
+            throw (new BadFieldsException(" Некорректное число страниц "));
+        }
         this.pagesNumber = pagesNumber;
     }
 
-    public void setPublishingYear(int publishingYear) {
+    public void setPublishingYear(int publishingYear) throws BadFieldsException {
+        if (publishingYear <= 0) {
+            throw (new BadFieldsException(" Некорректное число страниц "));
+        }
         this.publishingYear = publishingYear;
     }
 
@@ -39,23 +46,23 @@ public class Book implements Serializable {
         this.title = title;
     }
 
-    public Book(String authors , String title , int publishingYear , int pagesNumber){
-        this.authors = authors;
-        this.pagesNumber = pagesNumber;
-        this.publishingYear = publishingYear;
-        this.title = title;
+    public Book(String authors, String title, int publishingYear, int pagesNumber) throws BadFieldsException {
+        this.setAuthors(authors);
+        this.setPagesNumber(pagesNumber);
+        this.setPublishingYear(publishingYear);
+        this.setTitle(title);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(obj == this){
+        if (obj == this) {
             return true;
         }
-        if( obj instanceof Book){
-            if(obj.hashCode() == hashCode()){
-                Book toEq = (Book)obj;
-                return authors.equals(toEq.authors)&&title.equals(toEq.title)&&(publishingYear==toEq.publishingYear)
-                        &&(pagesNumber==toEq.pagesNumber);
+        if (obj instanceof Book) {
+            if (obj.hashCode() == hashCode()) {
+                Book toEq = (Book) obj;
+                return authors.equals(toEq.authors) && title.equals(toEq.title) && (publishingYear == toEq.publishingYear)
+                        && (pagesNumber == toEq.pagesNumber);
             }
         }
         return false;
@@ -63,12 +70,12 @@ public class Book implements Serializable {
 
     @Override
     public String toString() {
-        return "Book(Authors: "+authors +" Title: "+ title + " Pub. Year: "+publishingYear + " Number of pages: "+pagesNumber+")";
+        return "Book(Authors: " + authors + " Title: " + title + " Pub. Year: " + publishingYear + " Number of pages: " + pagesNumber + ")";
     }
 
     @Override
     public int hashCode() {
-        return authors.hashCode()^title.hashCode()^pagesNumber^publishingYear;
+        return authors.hashCode() ^ title.hashCode() ^ pagesNumber ^ publishingYear;
     }
 
 

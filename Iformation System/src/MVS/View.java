@@ -1,11 +1,11 @@
 package MVS;
 
 /**
- * View - вывод данных в консоль;
+ * View - console data output;
  */
 class View {
     /**
-     * Метод для вывода на экран данных из базы данных;
+     * This method is used to output data from the library in console;
      *
      * @param obj - выводимы на эран объект;
      */
@@ -16,7 +16,7 @@ class View {
     }
 
     /**
-     * Метод для вывода сообщений для пользователя;
+     * This method is used to output Information about library for user in console;
      *
      * @param info - информация для пользователя выводимая на экран;
      */

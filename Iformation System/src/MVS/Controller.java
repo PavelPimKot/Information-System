@@ -5,84 +5,97 @@ import InformationClasses.*;
 import java.io.*;
 
 /**
- * Контроллер - отвечает за взаимодействие с пользователем;
+ * Controller - works with user, read and checks commands
  */
 public class Controller {
 
 
     /**
-     * Список команд справочной системы::
-     * Get - Получение объекта из базы данных;
-     * SetBook - Изменение существующего в базе данных объекта на объект типа Book;
-     * SetBookInst - Изменение существующего объекта в базе данных на объект типа BookInstance;
-     * AddBook - Добавление в базу данных объект типа Book;
-     * AddBookInstance - Добавление в базу данных объекта типа BookInstance;
-     * Delete - Удаление объекта из базы данных;
-     * AddInfFromFile - Добавление объектов из указанного файла в базу данных;
-     * Search - поиск в базе данных по указанному шаблонуж
-     * Exit - выход из справочника;
+     * Library Command List::
+     * Get - get information from library ;
+     * SetBook - Change info in library by Book from user;
+     * SetBookInst - Change info in library by BookInstance from user;
+     * AddBook - Add Book to the library;
+     * AddBookInstance - Add BookInstance to the library;
+     * Delete - Delete info from library;
+     * Clear - Delete all info from library;
+     * AddInfFromFile - Add Info to the library from another file;
+     * Search - template Search in library;
+     * Show - View Library to the screen;
+     * Exit - Exit from library program;
      */
 
     private static final String[] Commands =
-            {"Get", "SetBook", "SetBookInst", "AddBook", "AddBookInst", "Delete", "AddInfFromFile", "Search", "Exit"};
+            {"Get", "SetBook", "SetBookInst", "AddBook",
+                    "AddBookInst", "Delete", "Clear", "AddInfFromFile",
+                    "Search", "Show", "Exit"};
 
 
     /**
-     * Метод служащий для начала работы со справочникомБ единственный public метод в классе;
-     * Выводит шаблонный вид типов хранящихся в базе данных и список команд справочной системы;
+     * This method is used to start work with library program, prints Library commands,
+     * info about data in library consist of;
      *
      * @throws IOException-
-     * @throws ClassNotFoundException-
      */
 
-    public static void startLibrary() throws ClassNotFoundException, IOException {
-        System.out.println();
-        System.out.println(" Справочная система ");
-        System.out.println();
-        System.out.println(" Содержание: Книга(авторы,название,год издания,число страниц)," +
-                " Экзепляр книги(инвент. номер, книга , выдана/нет)");
-        System.out.println();
-        getCoommadList();
-        Model.updateRuntimeDatabase();
-        Reader in = new InputStreamReader(System.in);
-        while (getCommand(in)) ;
+    static void startLibrary() throws IOException {
+        try {
+            System.out.println();
+            System.out.println(" Library :: ");
+            System.out.println();
+            System.out.println("Contents: Book (authors, title, year of publication, number of pages)," +
+                    " Book Instance (inventory number, Book, issued / not) ");
+            System.out.println();
+            getCommandList();
+            Model.updateRuntimeDatabase();
+            Reader in = new InputStreamReader(System.in);
+            while (getCommand(in)) ;
+        }
+        catch (Exception e) {
+            View.informationForUser(" Invalid program end, data is saved in Database ");
+            Model.updateDatabase();
+        }
     }
 
 
     /**
-     * Метод служащий для вывода всех команд справочника их их назначения в консоль;
+     * This method is used to print command list;
      */
 
-    private static void getCoommadList() {
-        System.out.println("Cписок команд::");
+    private static void getCommandList() {
+        System.out.println("Command List ::");
         System.out.println();
-        System.out.println(Commands[0] + ": Получение информации по индексу ");
+        System.out.println(Commands[0] + ": Retrieving Index Information ");
         System.out.println();
-        System.out.println(Commands[1] + ": Замена объекта в библиотеке(по индексу) на  книгу ");
+        System.out.println(Commands[1] + ": Replacing an object in a library (by index) with a book ");
         System.out.println();
-        System.out.println(Commands[2] + ": Замена объекта в библиотеке(по индексу)  Экзепляр книги");
+        System.out.println(Commands[2] + ": Replacing an object in a library (by index) Book instance ");
         System.out.println();
-        System.out.println(Commands[3] + ": Добавление книги в библиотеку ");
+        System.out.println(Commands[3] + ": Adding a book to the library ");
         System.out.println();
-        System.out.println(Commands[4] + ": Добавление Экземпляра книги в библиотеку ");
+        System.out.println(Commands[4] + ": Adding a Book Instance to the library ");
         System.out.println();
-        System.out.println(Commands[5] + ": Удаление  информации по индексу ");
+        System.out.println(Commands[5] + ": Delete information by index ");
         System.out.println();
-        System.out.println(Commands[6] + ": Добавление информации в справочник из файла");
+        System.out.println(Commands[6] + ": Delete all information from library");
         System.out.println();
-        System.out.println(Commands[7] + ": Поиск в справочнике по шаблону ");
+        System.out.println(Commands[7] + ": Adding information to the library from a file");
         System.out.println();
-        System.out.println(Commands[8] + ": Завершение текущего сеанса ");
+        System.out.println(Commands[8] + ": Template search ");
+        System.out.println();
+        System.out.println(Commands[9] + ": Displaying the contents of the library on the screen ");
+        System.out.println();
+        System.out.println(Commands[10] + ": End current session ");
         System.out.println();
     }
 
 
     /**
-     * Метод для получения объекта из базы данных, по введенному пользователю индексу;
-     * <Если будет введено не целое число , то выводится сообщение об ошибке
-     * <и метод модели не вызывается;
+     * This method is used to get info from library by index from user;
+     * <If written by user info is not an integer - library will print;
+     * <message about incorrect input;
      *
-     * @param in - поток ввода данных , в данном случае консоль
+     * @param in - input stream(Console);
      * @throws IOException-
      */
 
@@ -91,22 +104,16 @@ public class Controller {
         input.nextToken();
         int position = (int) input.nval;
         if (input.sval != null) {
-            View.informationForUser(" Введенная информация не является индексом ");
+            View.informationForUser(" The information entered is not an index ");
         } else
             Model.getInfFromBase(position);
     }
 
 
     /**
-     * Метод для замены объекта по указанному индексу на введенный пользователюж
-     * Вводится объект Book;
-     * <Т.к. названия книг\авторы не обязательно будут представлены в виде строки -
-     * <например : 1703 , даже если введа не строка , все равно приводим к строке и записываем
-     * <в поле объекта;
-     * <Если год Публикации книги или кол-во страниц меньше 0 или не явл числом
-     * <метод модели не вызывается и выводится сообщение пользователю об ошибке
+     * This method is used to set object by Book to the library;
      *
-     * @param in - поток ввода данных , в данном случае консоль;
+     * @param in - input stream(Console);
      * @throws IOException-
      */
 
@@ -141,11 +148,10 @@ public class Controller {
 
 
     /**
-     * Метод замены объекта по указанному индексу на введенный пользователю;
-     * Вводится объект BookInstance;
+     * This method is used to set object by  BookInstance to the library;
      * <@see 108>
      *
-     * @param in - поток ввода данных , в данном случае консоль;
+     * @param in - input stream(Console);
      * @throws IOException-
      */
 
@@ -188,9 +194,9 @@ public class Controller {
 
 
     /**
-     * Метод для удаления объекта из базы данных по указаному индексу;
+     * This method is used to  delete info from library;
      *
-     * @param in - поток ввода данных , в данном случае консоль;
+     * @param in - input stream(Console);
      * @throws IOException-
      * @see 89-90
      */
@@ -200,18 +206,17 @@ public class Controller {
         input.nextToken();
         int position = (int) input.nval;
         if (input.sval != null) {
-            View.informationForUser(" Введенная информация не является индексом ");
+            View.informationForUser(" The information entered is not an index ");
         } else
             Model.deleteInfFromBase(position);
     }
 
 
     /**
-     * Метод добавления объекта по указанному индексу на введенный пользователю;
-     * Вводится объект Book;
+     * This method is used to add Book to the library;
      * <@see 108>
      *
-     * @param in - поток ввода данных , в данном случае консоль;
+     * @param in - input stream(Console);
      * @throws IOException-
      */
 
@@ -244,11 +249,10 @@ public class Controller {
 
 
     /**
-     * Метод добавления объекта по указанному индексу на введенный пользователю;
-     * Вводится объект BookInstance;
+     * This method is used to add BookInstance to the library;
      * <@see 108>
      *
-     * @param in - поток ввода данных , в данном случае консоль;
+     * @param in - input stream(Console);
      * @throws IOException-
      */
 
@@ -288,32 +292,24 @@ public class Controller {
 
 
     /**
-     * Метод для добаления всех объекта из указанного файла;
-     * Если вводимые путь и названия файла не являются строками - выводится сообщение об ошибке;
+     * This method is used to add information to the library from entered filename and path;
      *
-     * @param in - поток ввода данных , в данном случае консоль;
+     * @param in - input stream(Console);
      * @throws IOException-
      */
 
     private static void addInfFromFile(Reader in) throws IOException, ClassNotFoundException {
-        String directory;
         String filename;
-        StreamTokenizer input = new StreamTokenizer(in);
-        input.nextToken();
-        directory = input.sval;
-        input.nextToken();
-        filename = input.sval;
-        if (directory == null || filename == null) {
-            View.informationForUser(" Аргумент/Аргументы не являются строками");
-        } else
-            Model.addInformationFromFile(new File(directory, filename));
+        BufferedReader input = new BufferedReader(in);
+        filename = input.readLine();
+        Model.addInformationFromFile(new File(filename));
     }
 
 
     /**
-     * Метод для поиска в базе данных по указанному пользователем шаблону
+     * This method is used to search info in library using template from user;
      *
-     * @param in-
+     * @param in - input stream(Console)
      * @throws IOException-
      */
 
@@ -323,16 +319,16 @@ public class Controller {
         input.nextToken();
         template = input.sval;
         if (input.sval == null) {
-            template = Double.toString(input.nval);
+            template = Integer.toString((int) input.nval);
         }
         Model.search(template);
     }
 
 
     /**
-     * Метод для получения команды для справочника(из указанного списка комманд);
+     * This method is used to get command from user and process information ;
      *
-     * @param in-
+     * @param in - input stream(Console)
      * @return Возвращает true усли можно продолжать работу со справочником - иначе false
      * @throws IOException-
      * @throws ClassNotFoundException-
@@ -360,6 +356,10 @@ public class Controller {
                     deleteInfo(in);
                     break;
                 }
+                case ("Clear"): {
+                    Model.clear();
+                    break;
+                }
                 case ("AddBook"): {
                     addBook(in);
                     break;
@@ -372,21 +372,25 @@ public class Controller {
                     addInfFromFile(in);
                     break;
                 }
+                case ("Show"): {
+                    Model.showDatabase();
+                    break;
+                }
                 case ("Search"): {
                     templateSearch(in);
                     break;
                 }
                 case ("Exit"): {
                     Model.updateDatabase();
-                    View.informationForUser(" Успешное заверщение работы со Справочником ");
+                    View.informationForUser(" Successfully completing the Library ");
                     return false;
                 }
                 default: {
-                    View.informationForUser(" Введенная строка не является командой справочника");
+                    View.informationForUser(" The entered string is not a reference command ");
                 }
             }
         } else {
-            View.informationForUser(" Введенная строка не является командой справочника");
+            View.informationForUser(" The entered string is not a reference command ");
         }
         return true;
     }

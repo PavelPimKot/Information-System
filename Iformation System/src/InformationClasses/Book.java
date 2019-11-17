@@ -30,14 +30,14 @@ public class Book implements Serializable {
 
     public void setPagesNumber(int pagesNumber) throws BadFieldsException {
         if (pagesNumber <= 0) {
-            throw (new BadFieldsException(" Некорректное число страниц "));
+            throw (new BadFieldsException(" Invalid page count "));
         }
         this.pagesNumber = pagesNumber;
     }
 
     public void setPublishingYear(int publishingYear) throws BadFieldsException {
         if (publishingYear <= 0) {
-            throw (new BadFieldsException(" Некорректное число страниц "));
+            throw (new BadFieldsException(" Invalid publishing year "));
         }
         this.publishingYear = publishingYear;
     }
@@ -70,7 +70,8 @@ public class Book implements Serializable {
 
     @Override
     public String toString() {
-        return "Book(Authors: " + authors + " Title: " + title + " Pub. Year: " + publishingYear + " Number of pages: " + pagesNumber + ")";
+        return "Book(Authors: " + authors + " Title: " + title + " Pub. Year: " + publishingYear +
+                " Number of pages: " + pagesNumber + ")";
     }
 
     @Override

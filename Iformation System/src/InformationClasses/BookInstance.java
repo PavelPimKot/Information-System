@@ -27,7 +27,7 @@ public class BookInstance implements Serializable {
 
     public void setInventoryNumber(int inventoryNumber) throws BadFieldsException {
         if (inventoryNumber < 0) {
-            throw (new BadFieldsException(" Неккоректный инветарный номер "));
+            throw (new BadFieldsException(" Invalid inventory number "));
         }
         this.inventoryNumber = inventoryNumber;
     }
@@ -44,7 +44,7 @@ public class BookInstance implements Serializable {
 
     @Override
     public String toString() {
-        return "BookInstance(Invent numb: " + inventoryNumber + " " + book.toString() + "issued: " + issued + ")";
+        return "BookInstance(Invent numb: " + inventoryNumber + "  (" + book.toString() + ")issued: " + issued + ")";
     }
 
     @Override

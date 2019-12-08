@@ -4,6 +4,7 @@ import java.io.IOException;
 
 public class InformationSystem {
     public static void startLibrary() throws IOException {
-        Controller.startLibrary();
+       View start = new View();
+       start.startLibrary();
     }
 }

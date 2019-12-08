@@ -6,10 +6,13 @@ import java.io.*;
 import java.util.ArrayList;
 
 
+
 /**
  * Model - works with data, performs writing \ reading \ deleting \ changing data in\to container
  */
 class Model {
+
+    private static EventManager viewConnection = new EventManager(new View());
 
     /**
      * Data is stored in serialized form;
@@ -21,7 +24,7 @@ class Model {
      */
     private static final File DIRECTORY = new File("C://Users//HP//Documents//GitHub//Information-System//Iformation System//src");
     private static final File DATABASE = new File(DIRECTORY, "Database.txt");
-    private static ArrayList<Object> runtimeDatabase = new ArrayList<>();
+    private static ArrayList<LibraryInfo> runtimeDatabase = new ArrayList<>();
 
 
     /**
@@ -29,10 +32,10 @@ class Model {
      */
     static void showDatabase() {
         if (runtimeDatabase.size() == 0) {
-            View.informationForUser(" Справочник пуст ");
+            viewConnection.notify(" Library is empty ");
         }
         for (Object object : runtimeDatabase) {
-            View.outputObjects(object);
+            viewConnection.notify(object.toString());
         }
     }
 
@@ -46,7 +49,7 @@ class Model {
 
     private static boolean isIndexInRange(int index) {
         if (index > runtimeDatabase.size() || index <= 0) {
-            View.informationForUser(" The index goes beyond the boundaries of the library ");
+            viewConnection.notify(" The index goes beyond the boundaries of the library ");
             return false;
         }
         return true;
@@ -67,18 +70,18 @@ class Model {
             try {
                 while (true) {
                     Object inf = input.readObject();
-                    if (inf instanceof Book || inf instanceof BookInstance) {
-                        addInfToBase(inf);
+                    if (inf instanceof LibraryInfo ) {
+                        addInfToBase((LibraryInfo)inf);
                     }
                 }
             }
             catch (IOException e) {
-                View.informationForUser(" File read successfully ");
+                viewConnection.notify(" File read successfully ");
             }
             input.close();
         }
         else{
-            View.informationForUser(" Invalid filename ");
+            viewConnection.notify(" Invalid filename ");
         }
     }
 
@@ -90,7 +93,7 @@ class Model {
      */
 
     static void search(String template) {
-        View.informationForUser(" Searching results:: ");
+        viewConnection.notify(" Searching results:: ");
         for (int i = 0; i < runtimeDatabase.size(); ++i) {
             if (runtimeDatabase.get(i).toString().contains(template)) {
                 getInfFromBase(i);
@@ -110,7 +113,7 @@ class Model {
     static void updateRuntimeDatabase() throws IOException, ClassNotFoundException {
         if (DATABASE.length() != 0) {
             ObjectInputStream input = new ObjectInputStream(new FileInputStream(DATABASE));
-            runtimeDatabase = (ArrayList<Object>) input.readObject();
+            runtimeDatabase = (ArrayList<LibraryInfo>) input.readObject();
             input.close();
         }
     }
@@ -122,12 +125,12 @@ class Model {
      * @param book- объект который нужно добавить в базу данных
      */
 
-    static void addInfToBase(Object book) {
+    static void addInfToBase(LibraryInfo book) {
         if (!runtimeDatabase.contains(book)) {
             runtimeDatabase.add(book);
-            View.informationForUser(" Data added successfully ");
+            viewConnection.notify(" Data added successfully ");
         } else {
-            View.informationForUser(" Such data already exists, object not added ");
+            viewConnection.notify(" Such data already exists, object not added ");
         }
     }
 
@@ -139,9 +142,8 @@ class Model {
      */
 
     static void getInfFromBase(int index) {
-        --index;// Because of numeration from 0 in ArrayList
         if (isIndexInRange(index))
-            View.outputObjects(runtimeDatabase.get(index));
+            viewConnection.notify(runtimeDatabase.get(index).toString());
     }
 
 
@@ -152,7 +154,6 @@ class Model {
      */
 
     static void deleteInfFromBase(int index) {
-        --index;// Because of numeration from 0 in ArrayList
         if (isIndexInRange(index)) {
             if (runtimeDatabase.get(index) instanceof BookInstance) {
                 BookInstance toDelete = (BookInstance) runtimeDatabase.get(index);
@@ -161,7 +162,7 @@ class Model {
             } else {
                 runtimeDatabase.remove(index);
             }
-            View.informationForUser(" Data deleted successfully ");
+            viewConnection.notify(" Data deleted successfully ");
         }
     }
 
@@ -170,7 +171,7 @@ class Model {
      * This method is used to clear library(delete all elements);
      */
     static void clear() {
-        View.informationForUser(" All data is deleted ");
+        viewConnection.notify(" All data is deleted ");
         runtimeDatabase.clear();
     }
 
@@ -182,27 +183,28 @@ class Model {
      * @param newInf- change by object;
      */
 
-    static void setInfInBase(int index, Object newInf) {
-        --index;// Because of numeration from 0 in ArrayList
+    static void setInfInBase(int index, LibraryInfo newInf) {
         if (!runtimeDatabase.contains(newInf) && isIndexInRange(index)) {
             runtimeDatabase.set(index, newInf);
-            View.informationForUser(" Data changed successfully ");
+            viewConnection.notify(" Data changed successfully ");
         } else {
-            View.informationForUser(" Such data already exists, object not changed ");
+            viewConnection.notify(" Such data already exists, object not changed ");
         }
     }
 
 
     /**
      * This method is used to update info in Database , call him before exit the library;
-     *
-     * @throws IOException-
      */
 
-    static void updateDatabase() throws IOException {
-        ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(DATABASE));
-        output.writeObject(runtimeDatabase);
-        output.close();
+    static void updateDatabase()  {
+        try {
+            ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(DATABASE));
+            output.writeObject(runtimeDatabase);
+            output.close();
+        }catch (IOException e){
+            viewConnection.notify(" Update Database Error ");
+        }
     }
 
 

@@ -1,11 +1,12 @@
 package InformationClasses;
 
 import java.io.Serializable;
+import java.util.UUID;
 
-public class BookInstance implements Serializable {
+public class BookInstance extends LibraryInfo implements Serializable   {
 
 
-    private int inventoryNumber;
+    private UUID inventoryNumber;
     private Book book;
     private boolean issued;
 
@@ -13,7 +14,7 @@ public class BookInstance implements Serializable {
         return book;
     }
 
-    public int getInventoryNumber() {
+    public UUID getInventoryNumber() {
         return inventoryNumber;
     }
 
@@ -25,20 +26,15 @@ public class BookInstance implements Serializable {
         this.book = book;
     }
 
-    public void setInventoryNumber(int inventoryNumber) throws BadFieldsException {
-        if (inventoryNumber < 0) {
-            throw (new BadFieldsException(" Invalid inventory number "));
-        }
-        this.inventoryNumber = inventoryNumber;
-    }
+
 
     public void setIssued(boolean issued) {
         this.issued = issued;
     }
 
-    public BookInstance(int inventoryNumber, Book book, boolean issued) throws BadFieldsException {
+    public BookInstance( Book book, boolean issued)  {
         this.book = book;
-        this.setInventoryNumber(inventoryNumber);
+        this.inventoryNumber = UUID.randomUUID();
         this.setIssued(issued);
     }
 
@@ -63,6 +59,6 @@ public class BookInstance implements Serializable {
 
     @Override
     public int hashCode() {
-        return inventoryNumber ^ book.hashCode();
+        return book.hashCode();
     }
 }

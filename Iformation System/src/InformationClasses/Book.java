@@ -2,7 +2,7 @@ package InformationClasses;
 
 import java.io.Serializable;
 
-public class Book implements Serializable {
+public class Book extends LibraryInfo implements Serializable  {
     private String authors;
     private String title;
     private int publishingYear;
@@ -47,6 +47,7 @@ public class Book implements Serializable {
     }
 
     public Book(String authors, String title, int publishingYear, int pagesNumber) throws BadFieldsException {
+        super();
         this.setAuthors(authors);
         this.setPagesNumber(pagesNumber);
         this.setPublishingYear(publishingYear);

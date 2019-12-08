@@ -7,87 +7,15 @@ import java.io.*;
 /**
  * Controller - works with user, read and checks commands
  */
-public class Controller {
+public class Controller implements EventListener {
 
 
-    /**
-     * Library Command List::
-     * Get - get information from library ;
-     * SetBook - Change info in library by Book from user;
-     * SetBookInst - Change info in library by BookInstance from user;
-     * AddBook - Add Book to the library;
-     * AddBookInstance - Add BookInstance to the library;
-     * Delete - Delete info from library;
-     * Clear - Delete all info from library;
-     * AddInfFromFile - Add Info to the library from another file;
-     * Search - template Search in library;
-     * Show - View Library to the screen;
-     * Exit - Exit from library program;
-     */
+    private EventManager viewConnection;
 
-    private static final String[] Commands =
-            {"Get", "SetBook", "SetBookInst", "AddBook",
-                    "AddBookInst", "Delete", "Clear", "AddInfFromFile",
-                    "Search", "Show", "Exit"};
-
-
-    /**
-     * This method is used to start work with library program, prints Library commands,
-     * info about data in library consist of;
-     *
-     * @throws IOException-
-     */
-
-    static void startLibrary() throws IOException {
-        try {
-            System.out.println();
-            System.out.println(" Library :: ");
-            System.out.println();
-            System.out.println("Contents: Book (authors, title, year of publication, number of pages)," +
-                    " Book Instance (inventory number, Book, issued / not) ");
-            System.out.println();
-            getCommandList();
-            Model.updateRuntimeDatabase();
-            Reader in = new InputStreamReader(System.in);
-            while (getCommand(in)) ;
-        }
-        catch (Exception e) {
-            View.informationForUser(" Invalid program end, data is saved in Database ");
-            Model.updateDatabase();
-        }
+    Controller(EventManager viewConnection){
+        this.viewConnection = viewConnection;
     }
 
-
-    /**
-     * This method is used to print command list;
-     */
-
-    private static void getCommandList() {
-        System.out.println("Command List ::");
-        System.out.println();
-        System.out.println(Commands[0] + ": Retrieving Index Information ");
-        System.out.println();
-        System.out.println(Commands[1] + ": Replacing an object in a library (by index) with a book ");
-        System.out.println();
-        System.out.println(Commands[2] + ": Replacing an object in a library (by index) Book instance ");
-        System.out.println();
-        System.out.println(Commands[3] + ": Adding a book to the library ");
-        System.out.println();
-        System.out.println(Commands[4] + ": Adding a Book Instance to the library ");
-        System.out.println();
-        System.out.println(Commands[5] + ": Delete information by index ");
-        System.out.println();
-        System.out.println(Commands[6] + ": Delete all information from library");
-        System.out.println();
-        System.out.println(Commands[7] + ": Adding information to the library from a file");
-        System.out.println();
-        System.out.println(Commands[8] + ": Template search ");
-        System.out.println();
-        System.out.println(Commands[9] + ": Displaying the contents of the library on the screen ");
-        System.out.println();
-        System.out.println(Commands[10] + ": End current session ");
-        System.out.println();
-    }
 
 
     /**
@@ -95,16 +23,15 @@ public class Controller {
      * <If written by user info is not an integer - library will print;
      * <message about incorrect input;
      *
-     * @param in - input stream(Console);
+     * @param input - input stream(Console);
      * @throws IOException-
      */
 
-    private static void getInfo(Reader in) throws IOException {
-        StreamTokenizer input = new StreamTokenizer(in);
+    private  void getInfo(StreamTokenizer input) throws IOException {
         input.nextToken();
         int position = (int) input.nval;
         if (input.sval != null) {
-            View.informationForUser(" The information entered is not an index ");
+            viewConnection.notify(" The information entered is not an index ");
         } else
             Model.getInfFromBase(position);
     }
@@ -113,15 +40,14 @@ public class Controller {
     /**
      * This method is used to set object by Book to the library;
      *
-     * @param in - input stream(Console);
+     * @param input - input stream(Console);
      * @throws IOException-
      */
 
-    private static void setBook(Reader in) throws IOException {
+    private void setBook(StreamTokenizer input) throws IOException {
         String authors, title;
         int publishingYear, pagesNumber;
         int position;
-        StreamTokenizer input = new StreamTokenizer(in);
         input.nextToken();
         position = (int) input.nval;
         input.nextToken();
@@ -142,7 +68,7 @@ public class Controller {
             Model.setInfInBase(position, new Book(authors, title, publishingYear, pagesNumber));
         }
         catch (BadFieldsException e) {
-            View.informationForUser(e.getMessage());
+            viewConnection.notify(e.getMessage());
         }
     }
 
@@ -151,18 +77,15 @@ public class Controller {
      * This method is used to set object by  BookInstance to the library;
      * <@see 108>
      *
-     * @param in - input stream(Console);
+     * @param input - input stream(Console);
      * @throws IOException-
      */
 
-    private static void setBookInstance(Reader in) throws IOException {
+    private void setBookInstance(StreamTokenizer input) throws IOException {
         String authors, title;
-        int publishingYear, pagesNumber, inventoryNumber;
+        int publishingYear, pagesNumber;
         int position;
         boolean issued = false;
-        StreamTokenizer input = new StreamTokenizer(in);
-        input.nextToken();
-        inventoryNumber = (int) input.nval;
         input.nextToken();
         position = (int) input.nval;
         input.nextToken();
@@ -184,11 +107,10 @@ public class Controller {
             issued = true;
         }
         try {
-            Model.setInfInBase(position, new BookInstance(inventoryNumber,
-                    new Book(authors, title, publishingYear, pagesNumber), issued));
+            Model.setInfInBase(position, new BookInstance(new Book(authors, title, publishingYear, pagesNumber), issued));
         }
         catch (BadFieldsException e) {
-            View.informationForUser(e.getMessage());
+            viewConnection.notify(e.getMessage());
         }
     }
 
@@ -196,17 +118,16 @@ public class Controller {
     /**
      * This method is used to  delete info from library;
      *
-     * @param in - input stream(Console);
+     * @param input - input stream(Console);
      * @throws IOException-
      * @see 89-90
      */
 
-    private static void deleteInfo(Reader in) throws IOException {
-        StreamTokenizer input = new StreamTokenizer(in);
+    private  void deleteInfo(StreamTokenizer input) throws IOException {
         input.nextToken();
         int position = (int) input.nval;
         if (input.sval != null) {
-            View.informationForUser(" The information entered is not an index ");
+            viewConnection.notify(" The information entered is not an index ");
         } else
             Model.deleteInfFromBase(position);
     }
@@ -216,14 +137,13 @@ public class Controller {
      * This method is used to add Book to the library;
      * <@see 108>
      *
-     * @param in - input stream(Console);
+     * @param input - input stream(Console);
      * @throws IOException-
      */
 
-    private static void addBook(Reader in) throws IOException {
+    private  void addBook(StreamTokenizer input) throws IOException {
         String authors, title;
         int publishingYear, pagesNumber;
-        StreamTokenizer input = new StreamTokenizer(in);
         input.nextToken();
         if (input.sval == null) {
             authors = Double.toString(input.nval);
@@ -242,7 +162,7 @@ public class Controller {
             Model.addInfToBase(new Book(authors, title, publishingYear, pagesNumber));
         }
         catch (BadFieldsException e) {
-            View.informationForUser(e.getMessage());
+            viewConnection.notify(e.getMessage());
         }
 
     }
@@ -252,17 +172,14 @@ public class Controller {
      * This method is used to add BookInstance to the library;
      * <@see 108>
      *
-     * @param in - input stream(Console);
+     * @param input - input stream(Console);
      * @throws IOException-
      */
 
-    private static void addBookInstance(Reader in) throws IOException {
+    private  void addBookInstance(StreamTokenizer input) throws IOException {
         String authors, title;
-        int publishingYear, pagesNumber, inventoryNumber;
+        int publishingYear, pagesNumber;
         boolean issued = false;
-        StreamTokenizer input = new StreamTokenizer(in);
-        input.nextToken();
-        inventoryNumber = (int) input.nval;
         input.nextToken();
         if (input.sval == null) {
             authors = Double.toString(input.nval);
@@ -282,11 +199,10 @@ public class Controller {
             issued = true;
         }
         try {
-            Model.addInfToBase(new BookInstance(inventoryNumber,
-                    new Book(authors, title, publishingYear, pagesNumber), issued));
+            Model.addInfToBase(new BookInstance(new Book(authors, title, publishingYear, pagesNumber), issued));
         }
         catch (BadFieldsException e) {
-            View.informationForUser(e.getMessage());
+            viewConnection.notify(e.getMessage());
         }
     }
 
@@ -294,14 +210,14 @@ public class Controller {
     /**
      * This method is used to add information to the library from entered filename and path;
      *
-     * @param in - input stream(Console);
+     * @param input - input stream(Console);
      * @throws IOException-
      */
 
-    private static void addInfFromFile(Reader in) throws IOException, ClassNotFoundException {
+    private void addInfFromFile(StreamTokenizer input) throws IOException, ClassNotFoundException {
         String filename;
-        BufferedReader input = new BufferedReader(in);
-        filename = input.readLine();
+        input.nextToken();
+        filename = input.sval;
         Model.addInformationFromFile(new File(filename));
     }
 
@@ -309,13 +225,12 @@ public class Controller {
     /**
      * This method is used to search info in library using template from user;
      *
-     * @param in - input stream(Console)
+     * @param input - input stream(Console)
      * @throws IOException-
      */
 
-    private static void templateSearch(Reader in) throws IOException {
+    private  void templateSearch(StreamTokenizer input) throws IOException {
         String template;
-        StreamTokenizer input = new StreamTokenizer(in);
         input.nextToken();
         template = input.sval;
         if (input.sval == null) {
@@ -329,69 +244,83 @@ public class Controller {
      * This method is used to get command from user and process information ;
      *
      * @param in - input stream(Console)
-     * @return Возвращает true усли можно продолжать работу со справочником - иначе false
-     * @throws IOException-
-     * @throws ClassNotFoundException-
      */
 
-    private static boolean getCommand(Reader in) throws IOException, ClassNotFoundException {
-        StreamTokenizer input = new StreamTokenizer(in);
-        input.nextToken();
-        String comm = input.sval;
-        if (comm != null) {
-            switch (comm) {
-                case ("Get"): {
-                    getInfo(in);
-                    break;
+    private  void getCommand(String in) throws IOException, ClassNotFoundException {
+
+            StreamTokenizer input = new StreamTokenizer(new StringReader(in));
+            input.nextToken();
+            String comm = input.sval;
+            if (comm != null) {
+                switch (comm.toLowerCase()) {
+                    case ("get"): {
+                        getInfo(input);
+                        break;
+                    }
+                    case ("setbook"): {
+                        setBook(input);
+                        break;
+                    }
+                    case ("setbookinst"): {
+                        setBookInstance(input);
+                        break;
+                    }
+                    case ("delete"): {
+                        deleteInfo(input);
+                        break;
+                    }
+                    case ("clear"): {
+                        Model.clear();
+                        break;
+                    }
+                    case ("addbook"): {
+                        addBook(input);
+                        break;
+                    }
+                    case ("addbookinst"): {
+                        addBookInstance(input);
+                        break;
+                    }
+                    case ("addinffromfile"): {
+                        addInfFromFile(input);
+                        break;
+                    }
+                    case ("show"): {
+                        Model.showDatabase();
+                        break;
+                    }
+                    case ("search"): {
+                        templateSearch(input);
+                        break;
+                    }
+                    case ("updateruntime"):{
+                        Model.updateRuntimeDatabase();
+                        break;
+                    }
+                    case ("update"):{
+                        Model.updateDatabase();
+                        break;
+                    }
+                    case ("exit"): {
+                        Model.updateDatabase();
+                        viewConnection.notify(" Successfully completing the Library ");
+                    }
+                    default: {
+                        viewConnection.notify(" The entered string is not a reference command ");
+                    }
                 }
-                case ("SetBook"): {
-                    setBook(in);
-                    break;
-                }
-                case ("SetBookInst"): {
-                    setBookInstance(in);
-                    break;
-                }
-                case ("Delete"): {
-                    deleteInfo(in);
-                    break;
-                }
-                case ("Clear"): {
-                    Model.clear();
-                    break;
-                }
-                case ("AddBook"): {
-                    addBook(in);
-                    break;
-                }
-                case ("AddBookInst"): {
-                    addBookInstance(in);
-                    break;
-                }
-                case ("AddInfFromFile"): {
-                    addInfFromFile(in);
-                    break;
-                }
-                case ("Show"): {
-                    Model.showDatabase();
-                    break;
-                }
-                case ("Search"): {
-                    templateSearch(in);
-                    break;
-                }
-                case ("Exit"): {
-                    Model.updateDatabase();
-                    View.informationForUser(" Successfully completing the Library ");
-                    return false;
-                }
-                default: {
-                    View.informationForUser(" The entered string is not a reference command ");
-                }
+            } else {
+                viewConnection.notify(" The entered string is not a reference command ");
             }
-        } else {
-            View.informationForUser(" The entered string is not a reference command ");
+    }
+
+    @Override
+    public void update(String eventType) {
+        try {
+            getCommand(eventType);
+        }catch (IOException|ClassNotFoundException e){
+            viewConnection.notify(" Invalid program end, data is saved in Database ");
+            Model.updateDatabase();
         }
-        return true;
     }
 }

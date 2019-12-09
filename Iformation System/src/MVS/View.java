@@ -36,7 +36,7 @@ class View implements EventListener {
 
 
 
-    /**т
+    /**
      * Library Command List::
      * Get - get information from library ;
      * SetBook - Change info in library by Book from user;

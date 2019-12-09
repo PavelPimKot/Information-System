@@ -6,7 +6,7 @@ import java.util.UUID;
 public class BookInstance extends LibraryInfo implements Serializable   {
 
 
-    private UUID inventoryNumber;
+
     private Book book;
     private boolean issued;
 
@@ -15,7 +15,7 @@ public class BookInstance extends LibraryInfo implements Serializable   {
     }
 
     public UUID getInventoryNumber() {
-        return inventoryNumber;
+        return super.getUuid();
     }
 
     public boolean getIssued() {
@@ -34,13 +34,13 @@ public class BookInstance extends LibraryInfo implements Serializable   {
 
     public BookInstance( Book book, boolean issued)  {
         this.book = book;
-        this.inventoryNumber = UUID.randomUUID();
+         super.setUuid(UUID.randomUUID());
         this.setIssued(issued);
     }
 
     @Override
     public String toString() {
-        return "BookInstance(Invent numb: " + inventoryNumber + "  (" + book.toString() + ")issued: " + issued + ")";
+        return "BookInstance(Invent numb: " + super.getUuid() + "  (" + book.toString() + ")issued: " + issued + ")";
     }
 
     @Override
@@ -51,7 +51,7 @@ public class BookInstance extends LibraryInfo implements Serializable   {
         if (obj instanceof BookInstance) {
             if (obj.hashCode() == hashCode()) {
                 BookInstance toEq = (BookInstance) obj;
-                return book.equals(toEq.book) && (inventoryNumber == toEq.inventoryNumber) && (issued == toEq.issued);
+                return book.equals(toEq.book) && (super.getUuid() == toEq.getUuid()) && (issued == toEq.issued);
             }
         }
         return false;
